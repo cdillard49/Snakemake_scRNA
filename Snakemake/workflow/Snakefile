@@ -1,0 +1,42 @@
+import glob
+import os
+
+
+configfile: "config/config.yaml", 
+
+           
+
+
+include: "rules/preprocessing.smk", 
+include: "rules/sort_comb.smk"
+
+
+           
+rule generate_fastq:
+    input:
+        fastq_1= expand("fastqs/{accession}_1.fastq", accession=config["SRR"]), 
+        fastq_2= expand("fastqs/{accession}_2.fastq", accession=config["SRR"])
+
+rule generate_bam:
+    input:
+        og_bam= expand("fastqs/{sample}_wasp_Aligned.sortedByCoord.out.bam", sample=config["Biosample"]), 
+        new_bam= expand("fastqs/{sample}_wasp_Aligned.sortedByCoord_vW_filt.bam", sample=config["Biosample"])
+        
+rule scExecute:
+    input: 
+#        gatk_filt_dir= directory("fastqs/gatk_output"), 
+#        strelka_filt_dir= directory("fastqs/strelka"), 
+        sorted_txt= expand("fastqs/ind_bams/{sample}_wasp_Aligned.sortedByCoord_vW_filt.{barcode}_{ext_sorted}", sample=config["Biosample"], barcode=barcodes, ext_sorted=["strelka_sorted.txt", "gatk_sorted.txt"])
+
+
+rule common:
+    input:
+        comm_file= expand("fastqs/ind_bams/{sample}_wasp_Aligned.sortedByCoord_vW_filt.{barcode}_comm.txt",sample=config["Biosample"], barcode=barcodes)
+        
+
+rule final_output:
+    input:
+        comb_file= expand("fastqs/ind_bams/{sample}_comb.txt", sample=config["Biosample"]), 
+        to_ss_file= expand("fastqs/ind_bams/{sample}_2ss.txt", sample=config["Biosample"])
+
+

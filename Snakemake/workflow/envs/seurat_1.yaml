@@ -1,0 +1,9 @@
+channels:
+  - conda-forge
+  - bioconda
+dependencies: 
+  - data.table
+  - tidyverse
+  - Seurat
+  - biomaRt
+  - R
